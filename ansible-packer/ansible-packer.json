@@ -1,0 +1,48 @@
+{
+  "variables": {
+     "client_id": "{{env `CLIENT_ID`}}",
+     "client_secret": "{{env `CLIENT_SECRET`}}",
+     "tenant_id": "{{env `TENANT_ID`}}",
+     "subscription_id": "{{env `SUBSCRIPTION_ID`}}",
+     "resource_group": "{{env `RESOURCE_GROUP`}}",
+     "image_name": "{{env `IMAGE_NAME`}}"
+  },  
+  "builders": [{ 
+      "type": "azure-arm",  
+      "client_id": "{{user `client_id`}}",
+      "client_secret": "{{user `client_secret`}}",
+      "tenant_id": "{{user `tenant_id`}}",
+      "subscription_id": "{{user `subscription_id`}}",
+
+      "managed_image_resource_group_name": "{{user `resource_group`}}",
+      "managed_image_name": "{{user `image_name`}}",
+
+      "os_type": "Linux",
+      "image_publisher": "Canonical",
+      "image_offer": "UbuntuServer",
+      "image_sku": "18.04-LTS",
+
+      "azure_tags": {
+          "dept": "Demo",
+          "task": "Standard Image Deployment"
+      },  
+      "location": "East US",
+      "vm_size": "Standard_DS2_v2"
+    }],
+  "provisioners": [
+    {
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
+      "inline": [
+        "apt-get update",
+        "apt-get upgrade -y",
+        "apt-get -y install ansible"
+       ],
+      "inline_shebang": "/bin/sh -x",
+      "type": "shell"
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "./ansible-packer/ansible-nginx.yml"
+    } 
+  ]
+}

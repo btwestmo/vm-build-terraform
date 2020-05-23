@@ -1,0 +1,38 @@
+import "tfplan"
+
+get_vms = func() {
+    vms = []
+    for tfplan.module_paths as path {
+        vms += values(tfplan.module(path).resources.azurerm_virtual_machine) else []
+    }
+    return vms
+}
+
+
+vm_chargeback_valid = func() {
+
+    validated = true
+    vms = get_vms()
+    for vms as _, instances {
+      for instances as index, r {
+          if r.destroy and not r.requires_new {
+            print("Skipping resource that is being destroyed.")
+            continue               
+          }
+          if r.applied.tags["chargeback-code"] else "" == "" {
+              validated = false
+              print ("VM ", r.applied.name, " has a missing chargeback tag")
+          }
+       }
+    }
+
+    return validated
+}
+
+vms_validated = vm_chargeback_valid()
+
+main = rule {
+  vms_validated
+}
+
+
