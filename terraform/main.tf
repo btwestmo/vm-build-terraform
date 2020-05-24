@@ -6,7 +6,7 @@ provider "azurerm" {
 # Locate the existing custom/golden image
 data "azurerm_image" "search" {
   name                = var.image_name
-  resource_group_name = "Hashi-Environment-Automation"  #var.resource_group_name""
+  resource_group_name = "Hashi-Environment-Automation"
 }
 
 output "image_id" {
@@ -14,13 +14,11 @@ output "image_id" {
 }
 
 resource "azurerm_virtual_network" "main" {
-  name                = "${var.resource_prefix}-network5"
+  name                = "${var.resource_prefix}-network"
   address_space       = ["10.0.0.0/16"]
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
 }
-
-
 
 resource "azurerm_public_ip" "static" {
   name                = "${var.resource_prefix}-public-ip"
@@ -72,10 +70,11 @@ resource "azurerm_virtual_machine" "main" {
 }  
 
   os_profile {
-    computer_name  = "rbstesthost"
+    computer_name  = "testhost"
     admin_username = "scott"
     admin_password = "Password1234!"
   }
+
   os_profile_linux_config {
     disable_password_authentication = false
     ssh_keys{
@@ -83,6 +82,7 @@ resource "azurerm_virtual_machine" "main" {
       path= var.ssh_public_key_path
     }
   }
+  
   tags = {
     environment = "dev"
     chargeback-code = "abc123"

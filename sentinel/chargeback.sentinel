@@ -8,9 +8,7 @@ get_vms = func() {
     return vms
 }
 
-
 vm_chargeback_valid = func() {
-
     validated = true
     vms = get_vms()
     for vms as _, instances {
@@ -25,7 +23,6 @@ vm_chargeback_valid = func() {
           }
        }
     }
-
     return validated
 }
 
@@ -34,5 +31,3 @@ vms_validated = vm_chargeback_valid()
 main = rule {
   vms_validated
 }
-
-
